@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "709144442111",
+    "firebase_url": "https://tryst-cc5ca.firebaseio.com",
+    "project_id": "tryst-cc5ca",
+    "storage_bucket": "tryst-cc5ca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:709144442111:android:4aec2a35298ea40b",
+        "android_client_info": {
+          "package_name": "eleventhourboy.tryst"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "709144442111-sn8bcpbp1lcqugjda5de4g7lus08e0ci.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "eleventhourboy.tryst",
+            "certificate_hash": "045a6ceaf066e9aadd8f50ab9eb6576b8e4678ea"
+          }
+        },
+        {
+          "client_id": "709144442111-gortqobihimpa72l49j8ohvfqdapnro7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1wOGKlTRM8mJOXWVeVN9ZGriewzjSzs0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "709144442111-gortqobihimpa72l49j8ohvfqdapnro7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
