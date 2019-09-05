@@ -61,13 +61,13 @@ class _RequestListingScreenState extends State<RequestListingScreen> {
       context,
       MaterialPageRoute(
         builder: (BuildContext context){
-          return QuoteListScreen(widget._requests[index]['request_id']);
+          //return QuoteListScreen(widget._requests[index]['request_id']);
         }
       )
     );
   }
 
   Future<List<Map<String,dynamic>>> _getRequestsFromDb()async{
-    return await RequestListingBackend().getRequestsFromDb(widget._screenType);
+    //return await RequestListingBackend().getRequestsFromDbFor(widget._screenType);
   }
 }

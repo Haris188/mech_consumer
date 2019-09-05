@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/widgets.dart';
 import 'backend-methods.dart';
-
+import 'package:firebase_storage/firebase_storage.dart';
 
 class AddRequestBackend{
 
@@ -10,6 +13,7 @@ class AddRequestBackend{
   static Map<String, dynamic> _location = {};
   static String _requestId;
   static Map<String, dynamic> _vehicleInfo = {};
+  static List _recievedList =new List();
 
   Future<List> getVehiclesFromDb() async{
     List vehicleList = [];
@@ -45,22 +49,30 @@ class AddRequestBackend{
     bool dataSubmitCheck;
     bool statusSubmitCheck;
     bool reqIdSubmitCheck;
+    bool videoSubmitCheck;
+    bool reqIdAddCheck;
 
     _requestInfoMap = requestMap;
     _location = await BackendMethods().getConsumerLocation();
     _requestId = Timestamp.now().microsecondsSinceEpoch.toString();
     _extractVehicleInfoFromRequest();
     _addAdditionalDataToMap();
+    videoSubmitCheck = await _addVideoToDb();
     dataSubmitCheck = await _addDataToRequest();
     vehicleSubmitCheck = await _addVehicleToRequest();
     statusSubmitCheck = await _addStatusToRequest();
-    reqIdSubmitCheck = await _addRequestIdToConsumerData() ;
+    reqIdAddCheck = await _addRequestIdToConsumerData() ;
+    reqIdSubmitCheck = await _updateRequestIdsList();
+    
+
 
     if(
       vehicleSubmitCheck &&
       dataSubmitCheck &&
       statusSubmitCheck &&
-      reqIdSubmitCheck
+      reqIdSubmitCheck &&
+      videoSubmitCheck &&
+      reqIdAddCheck
     ){
       return true;
     }
@@ -74,7 +86,6 @@ class AddRequestBackend{
     print(_requestInfoMap['vehicle']);
     _vehicleInfo = _requestInfoMap['vehicle'];
     _requestInfoMap.remove('vehicle');
-    _requestInfoMap.remove('file');
     //print(_requestInfoMap);
   }
 
@@ -154,7 +165,13 @@ class AddRequestBackend{
     await Firestore.instance.collection('consumer_accounts')
       .document(_currentUid).collection('requests')
       .document('request_ids')
-      .setData({'$_requestId': _requestId})
+      .get().then((onValue){
+        if(onValue.data == null){
+          _recievedList += onValue.data['request_ids'];
+        }else{
+          _recievedList = ['$_requestId'];
+        }
+      })
       .whenComplete((){
         result = true;
       })
@@ -165,5 +182,53 @@ class AddRequestBackend{
       });
 
     return result;
+  }
+
+  Future<bool> _updateRequestIdsList()async{
+    bool result= false;
+
+    _recievedList.add(_requestId);
+    await Firestore.instance.collection('consumer_accounts')
+      .document(_currentUid).collection('requests')
+      .document('request_ids')
+      .setData({'request_ids': _recievedList})
+      .whenComplete((){
+        result = true;
+      })
+      .catchError((onError){
+        print('cant upload @ add_request_backend > updateRequestIdsList()');
+        print(onError);
+        result = false;
+      });
+      return result;
+  }
+
+  Future<bool> _addVideoToDb() async{
+    bool result;
+    bool submitResult;
+    bool linkSubmitResult;
+
+    submitResult = await _submitVideoFile();
+    _deleteFileFromInfoMap();
+    result = submitResult;
+    return result;
+  }
+
+  Future<bool> _submitVideoFile() async{
+    bool submitResult= false;
+    String vidDownloadUrl;
+    File file = _requestInfoMap['file'];
+
+    StorageReference ref = FirebaseStorage.instance.ref().child('$_requestId');
+    await ref.putFile(file).onComplete.then((snap) async{
+      vidDownloadUrl = await snap.ref.getDownloadURL();
+      submitResult = true;
+    });
+    _requestInfoMap.addAll({'attachment_url' : vidDownloadUrl});
+    return submitResult;
+  }
+
+  void _deleteFileFromInfoMap(){
+    _requestInfoMap.remove('file');
   }
 }
