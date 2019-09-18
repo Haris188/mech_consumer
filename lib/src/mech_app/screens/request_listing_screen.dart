@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import '../backend/request_listing_backend.dart';
+import 'quote_list_screen.dart';
 
 class RequestListingScreen extends StatefulWidget {
 
@@ -25,17 +27,63 @@ class _RequestListingScreenState extends State<RequestListingScreen> {
     return FutureBuilder(
       future: _getRequestsFromDb(),
       builder: (BuildContext context, AsyncSnapshot<List<Map<String,dynamic>>> requests){
-        widget._requests = requests.data;
-        return _createRequestList();
+        if(requests.data.length < 1){
+          return _noRequestWidget();
+        }
+        if(requests.data[0]['result'] == 'timeout'){
+          return _getTimeoutText();
+        }
+        else if(requests.data[0]['result'] == false){
+          return _getLoadingWidget();
+        }
+        else{
+          widget._requests = requests.data;
+          return _createRequestList();
+        }
       },
+      initialData: [{'result': false}],
+    );
+  }
+
+  Widget _noRequestWidget(){
+    if(widget._screenType == 'active'){
+      return _noRequestText('active');
+    }
+    else if(widget._screenType == 'archived'){
+      return _noRequestText('archived');
+    }
+  }
+
+  Widget _noRequestText(String text){
+    return Center(
+      child: Text(
+        'No $text requests'
+      ),
+    );
+  }
+
+  Widget _getTimeoutText(){
+    return Container(
+      child: Center(
+        child: Text("Cant load requests. Please check your internet"),
+      ),
+    );
+  }
+
+  Widget _getLoadingWidget(){
+    return Container(
+      child: Center(
+        child: Text("Loading..."),
+      ),
     );
   }
 
   Widget _createRequestList(){
-    ListView.builder(
+    return ListView.builder(
       itemBuilder: (BuildContext context, int index){
         return _createListItemTile(index);
       },
+      itemCount: widget._requests.length,
     );
   }
 
@@ -61,13 +109,13 @@ class _RequestListingScreenState extends State<RequestListingScreen> {
       context,
       MaterialPageRoute(
         builder: (BuildContext context){
-          //return QuoteListScreen(widget._requests[index]['request_id']);
+          return QuoteListingScreen(widget._screenType, widget._requests[index]['request_id']);
         }
       )
     );
   }
 
   Future<List<Map<String,dynamic>>> _getRequestsFromDb()async{
-    //return await RequestListingBackend().getRequestsFromDbFor(widget._screenType);
+    return await RequestListingBackend().getRequestsFromDbFor(widget._screenType);
   }
 }

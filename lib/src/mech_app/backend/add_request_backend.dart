@@ -102,8 +102,8 @@ class AddRequestBackend{
 
     await Firestore.instance.collection('requests')
       .document(_location['country']).collection(_location['state'])
-      .document(_location['city']).collection(_requestId)
-      .document('request_info').setData(_requestInfoMap)
+      .document(_location['city']).collection('request_info')
+      .document(_requestId).setData(_requestInfoMap)
       .whenComplete((){
         result = true;
       })
@@ -122,8 +122,8 @@ class AddRequestBackend{
     print(_vehicleInfo);
     await Firestore.instance.collection('requests')
       .document(_location['country']).collection(_location['state'])
-      .document(_location['city']).collection(_requestId)
-      .document('request_info').collection('vehicle')
+      .document(_location['city']).collection('request_info')
+      .document(_requestId).collection('vehicle')
       .add(_vehicleInfo)
       .whenComplete((){
         result = true;
@@ -143,8 +143,8 @@ class AddRequestBackend{
 
     await Firestore.instance.collection('requests')
       .document(_location['country']).collection(_location['state'])
-      .document(_location['city']).collection(_requestId)
-      .document('request_info')
+      .document(_location['city']).collection('request_info')
+      .document(_requestId)
       .updateData({'status': 'open'})
       .whenComplete((){
         result = true;
@@ -165,11 +165,14 @@ class AddRequestBackend{
     await Firestore.instance.collection('consumer_accounts')
       .document(_currentUid).collection('requests')
       .document('request_ids')
-      .get().then((onValue){
-        if(onValue.data == null){
-          _recievedList += onValue.data['request_ids'];
+      .get().then((onValue)async{
+        if(onValue.data != null){
+          _recievedList += await onValue.data['request_ids'];
+          print('if run');
         }else{
-          _recievedList = ['$_requestId'];
+          _recievedList = [];
+          print('else run');
+          print(onValue.data);
         }
       })
       .whenComplete((){
@@ -194,6 +197,7 @@ class AddRequestBackend{
       .setData({'request_ids': _recievedList})
       .whenComplete((){
         result = true;
+        _recievedList.clear();
       })
       .catchError((onError){
         print('cant upload @ add_request_backend > updateRequestIdsList()');

@@ -18,28 +18,35 @@ class MechApp{
   Future<Null> start() async{
     _uidAvailableInDb = await _checkDbForCurrentUid();
     if(_uidAvailableInDb){
+      print('main');
       _navigateToScreenNamed('MainScreen');
     }
     else{
+      print('profile');
       _navigateToScreenNamed('ProfileMakeup');
     }
   }
 
   Future<bool> _checkDbForCurrentUid() async{
-    try {
-      DocumentSnapshot snap = await Firestore.instance
-      .collection('consumer_accounts')
-      .document(_user.uid).get();
-      if(snap.data == null){
-        return false;
-      }
-      else{
-        return true;
-      }
-    } 
-    catch (e) {
-      print('couldnt read db @ MechApp > checkDbForCurrentUid');
-    }
+    bool result;
+    await Firestore.instance.collection('consumer_accounts')
+      .document(_user.uid)
+      .get()
+      .then((doc){
+        if(doc.data != null){
+          if(doc.data['consumer_id'] == _user.uid){
+            result = true;
+            }
+          }
+        else{
+          result = false;
+        }
+      })
+      .catchError((e){
+        print("error @ MechAppMain > checkfor ID");
+        print(e);
+      });
+    return result;
   }
 
   void _navigateToScreenNamed(String screen){

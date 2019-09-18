@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'authentication.dart';
+import 'mech_app/mech_app_main.dart';
 
 class LoginScreen{
 
@@ -88,8 +89,8 @@ class LoginScreenBody extends StatelessWidget {
     );
   }
 
-  void _whenGoogleLoginPressed(){
-    _login();
+  Future<void> _whenGoogleLoginPressed() async{
+    await _login();
     _startMechApp();
   }
 
@@ -99,7 +100,7 @@ class LoginScreenBody extends StatelessWidget {
 
   void _startMechApp(){
     if(_isLoginSuccessful()){
-      //MechApp(_user).start();
+      MechApp(_user, _context).start();
     }
   }
 

@@ -117,6 +117,7 @@ class _CarInfoFormScreenState extends State<CarInfoFormScreen> {
 
   Widget _createTransmissionField(BuildContext context){
     return TextFormField(
+      controller: _transmissionController,
       decoration: InputDecoration(
         hintText: "AWD, RWD, etc",
         labelText: 'Transmission'
@@ -197,7 +198,8 @@ class _CarInfoFormScreenState extends State<CarInfoFormScreen> {
       'trim': _trimController.text,
       'transmission': _transmissionController.text,
       'drivetrain' : _driveTrainController.text,
-      'mileage': _mileageController.text
+      'mileage': _mileageController.text,
+      'fuel_type': _fuelTypeController.text
     };
   }
 

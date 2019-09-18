@@ -68,6 +68,24 @@ class ProfileMakeupBackend{
     return result;
   }
 
+  Future<bool> submitConsumerIdToDb() async{
+    bool result;
+    print('submitconsumerBackend');
+    await Firestore.instance.collection('consumer_accounts')
+      .document(_user.uid)
+      .setData({'consumer_id': _user.uid})
+      .whenComplete((){
+        print('completed executed');
+        result = true;
+      })
+      .catchError((e){
+        result = false;
+        print('Cant submit id @ ProfileMakeupBackend > submitConsumerIdToDb()');
+        print(e);
+      });
+    return result;
+  }
+
   Future<FirebaseUser> _getFirebaseUser() async{
     FirebaseUser user = await Authenticator().signInWithGoogle();
     return user;

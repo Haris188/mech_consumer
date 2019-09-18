@@ -1,5 +1,6 @@
 // classes and functions for authentication
 
+import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -29,5 +30,9 @@ class Authenticator{
         print(e.toString());
         return null;
     }
+  }
+
+  Future<void> logout() async{
+    await GoogleSignIn().signOut();
   }
 }

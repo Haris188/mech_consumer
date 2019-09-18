@@ -1,8 +1,10 @@
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../backend/profile_makeup_backend.dart';
 import 'main_screen.dart';
 import 'car-info-form-screen.dart';
+import 'dart:convert';
 
 class ProfileMakeupScreen extends StatefulWidget {
 
@@ -22,6 +24,8 @@ class _ProfileMakeupScreenState extends State<ProfileMakeupScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController stateController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
+   String _stateValue;
+   String _cityValue;
 
   @override
   Widget build(BuildContext context) {
@@ -65,51 +69,105 @@ class _ProfileMakeupScreenState extends State<ProfileMakeupScreen> {
   Column _createLocationFormFields(){
     return Column(
       children: <Widget>[
-        _createStateTextField(),
-        _createCityTextField()
+        // _createStateTextField(),
+        // _createCityTextField()
+        _createStateDropdownRow(),
+        _createCityDropdownRow()
       ],
     );
   }
 
-  TextFormField _createStateTextField(){
-    return TextFormField(
-      controller: stateController,
-      decoration: InputDecoration(
-        labelText: 'State',
-        hintText: 'In which state do you live?',
-      ),
-      validator: (value){return _validateState(value);},
+  Widget _createStateDropdownRow(){
+    return Row(
+      children: <Widget>[
+        _getStateDropdownText(),
+        _createStateDropdown()
+      ],
     );
   }
 
-  
-  String _validateState(String value){
-    if(value.length < 1){
-      return 'Required';
-    }
-    else{
-      return null;
-    }
+  Widget _getStateDropdownText(){
+    return Text('Select your State: ');
   }
 
-  TextFormField _createCityTextField(){
-    return TextFormField(
-      controller: cityController,
-      decoration: InputDecoration(
-        labelText: 'City',
-        hintText: 'In which city do you live?',
-      ),
-      validator: (value){return _validateCity(value);},
+  Widget _createStateDropdown(){
+    return FutureBuilder(
+      future: _getStates(),
+      builder: (BuildContext context, AsyncSnapshot stateListSnap){
+        return DropdownButton(
+          value: _stateValue,
+          items: stateListSnap.data,
+          onChanged: (value){_replaceStateWith(value);},
+        );
+      },
     );
   }
 
-  String _validateCity(String value){
-    if(value.length < 1){
-      return 'Required';
-    }
-    else{
-      return null;
-    }
+  Future<List<DropdownMenuItem>>_getStates() async{
+    List<dynamic> listOfStates = 
+      json.decode(await rootBundle.loadString('lib/src/mech_app/assets/states.json'));
+    List<DropdownMenuItem<String>> itemList
+      = listOfStates.map<DropdownMenuItem<String>>((state){
+          return DropdownMenuItem<String>(
+            value: state['name'],
+            child: Text(state['name']),
+          );
+      }).toList();
+    return itemList;
+  }
+
+  void _replaceStateWith(String value){
+    setState(() {
+      _stateValue = value;
+    });
+  }
+
+  Widget _createCityDropdownRow(){
+    return Row(
+      children: <Widget>[
+        _getCityDropdownText(),
+        _createCityDropdown()
+      ],
+    );
+  }
+
+  Widget _getCityDropdownText(){
+    return Text('Select your City: ');
+  }
+
+  Widget _createCityDropdown(){
+    return FutureBuilder(
+      future: _getCities(),
+      builder: (BuildContext context, AsyncSnapshot cityListSnap){
+        return DropdownButton(
+          value: _cityValue,
+          items: cityListSnap.data,
+          onChanged: (value){_replaceCityWith(value);},
+        );
+      },
+    );
+  }
+
+  Future<List<DropdownMenuItem>>_getCities() async{
+    List<dynamic> listOfStates = 
+      json.decode(await rootBundle.loadString('lib/src/mech_app/assets/cities.json'));
+    listOfStates = listOfStates.where((city){
+      return city['admin'] == _stateValue;
+    }).toList();
+    List<DropdownMenuItem<String>> itemList
+      = listOfStates.map<DropdownMenuItem<String>>((city){
+          return DropdownMenuItem<String>(
+            value: city['city'],
+            child: Text(city['city']),
+          );
+      }).toList();
+    return itemList;
+  }
+
+  void _replaceCityWith(String value){
+    setState(() {
+      _cityValue = value;
+    });
   }
 
   Widget _createListOfCars(){
@@ -218,7 +276,7 @@ class _ProfileMakeupScreenState extends State<ProfileMakeupScreen> {
   }
 
   Future<void> _whenSubmitPressed() async{
-    bool isValidation = _formKey.currentState.validate();
+    bool isValidation = (_cityValue != null) && (_stateValue != null);
     if(
       carsList.length > 0 && 
       carsList != null &&
@@ -237,7 +295,8 @@ class _ProfileMakeupScreenState extends State<ProfileMakeupScreen> {
   Future<Map<String, bool>> _getSubmitResultMap() async{
     Map<String, bool> resMap= {
       'car': await _submitCarDataToDb(),
-      'location': await _submitLocationToDb()
+      'location': await _submitLocationToDb(),
+      'id': await _submitConsumerIdToDb()
     };
     return resMap;
   }
@@ -245,7 +304,7 @@ class _ProfileMakeupScreenState extends State<ProfileMakeupScreen> {
   void _assertSubmitResults(Map<String, bool> resMap){
     print(resMap);
     if(
-      resMap['car'] && resMap['location']
+      resMap['car'] && resMap['location'] && resMap['id']
     ){
       _openMainScreen();
     }
@@ -257,11 +316,17 @@ class _ProfileMakeupScreenState extends State<ProfileMakeupScreen> {
         .submitLocationToDb(location);
   }
 
+  Future<bool> _submitConsumerIdToDb() async{
+    print('subconsumerexecuted');
+    return await ProfileMakeupBackend(widget._user)
+        .submitConsumerIdToDb();
+  }
+
   void _prepareLocationMap(){
     location = {
       'country': 'canada',
-      'state': stateController.text,
-      'city': cityController.text
+      'state': _stateValue,
+      'city': _cityValue
     };
   }
 

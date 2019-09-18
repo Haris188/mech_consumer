@@ -5,11 +5,11 @@ import 'src/authentication.dart';
 import 'src/mech_app/screens/main_screen.dart';
 import 'material_app.dart';
 
-// void main(List<String> args) {
-//   runApp(
-//     Tryst().getMaterialApp()
-//   );
-// }
+void main(List<String> args) {
+  runApp(
+    Tryst().getMaterialApp()
+  );
+}
 
 // main(List<String> args) async{
 //   runApp(
@@ -19,12 +19,12 @@ import 'material_app.dart';
 //   );
 // }
 
-main(List<String> args) {
-  runApp(
-    MaterialApp(
-      theme: ThemeData(accentColor: Colors.blue.shade700),
-      debugShowCheckedModeBanner: false,
-      home: MainScreen(),
-    )
-  );
-}
+// main(List<String> args) {
+//   runApp(
+//     MaterialApp(
+//       theme: ThemeData(accentColor: Colors.blue.shade700),
+//       debugShowCheckedModeBanner: false,
+//       home: MainScreen(),
+//     )
+//   );
+// }

@@ -1,6 +1,9 @@
 
 import 'package:flutter/material.dart';
 import 'add_request_form_screen.dart';
+import 'request_listing_screen.dart';
+import '../../authentication.dart';
+import '../../login_screen.dart';
 
 class MainScreen extends StatelessWidget {
 
@@ -152,7 +155,8 @@ class MainScreen extends StatelessWidget {
       children: <Widget>[
         _createAddRequestTile(),
         _createActiveRequestTile(),
-        _createArchivedRequestTile()
+        _createArchivedRequestTile(),
+        _createLogoutTile()
       ],
     );
   }
@@ -208,7 +212,7 @@ class MainScreen extends StatelessWidget {
   MaterialPageRoute _getActiveRoute(){
     return MaterialPageRoute(
       builder: (BuildContext context){
-        //return RequestListingScreen('active');
+        return RequestListingScreen('active');
       }
     );
   }
@@ -236,11 +240,40 @@ class MainScreen extends StatelessWidget {
   MaterialPageRoute _getArchivedRoute(){
     return MaterialPageRoute(
       builder: (BuildContext context){
-        //return RequestListingScreen('archived');
+        return RequestListingScreen('archived');
       }
     );
   }
 
+  Widget _createLogoutTile(){
+    return ListTile(
+          title: _getLogoutText(),
+          onTap: (){
+            _whenLogoutPressed();
+          },
+        );
+  }
+
+  Widget _getLogoutText(){
+    return Text(
+      'Logout',
+      style: _getMenuListTextStyle(),
+    );
+  }
+
+  Future<void> _whenLogoutPressed() async{
+    await Authenticator().logout();
+    MaterialPageRoute route = _getLoginRoute();
+    Navigator.push(_context, route);
+  }
+
+  MaterialPageRoute _getLoginRoute(){
+    return MaterialPageRoute(
+      builder: (BuildContext context){
+        return LoginScreen().getScaffold();
+      }
+    );
+  }
 
   TextStyle _getMenuListTextStyle(){
     return TextStyle(

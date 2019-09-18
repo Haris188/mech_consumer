@@ -261,7 +261,6 @@ class _AddRequestFormScreenState extends State<AddRequestFormScreen> {
         submitSuccess = await AddRequestBackend().addRequestToDb(_requestInfoMap);
         if(submitSuccess){
           Navigator.pop(context);
-          this.dispose();
         }
       }
     }
@@ -281,5 +280,7 @@ class _AddRequestFormScreenState extends State<AddRequestFormScreen> {
     super.dispose();
     _requestInfoMap.clear();
     _titleController.text = "";
+    _descriptionController.text = "";
+    _videoFile = null;
   }
 }
