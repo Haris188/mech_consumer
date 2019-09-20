@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import '../backend/quote_detail_backend.dart';
+import 'chat_screen.dart';
 
 class QuoteDetailScreen extends StatelessWidget {
   final Map<String, dynamic> _quoteInfo;
@@ -55,8 +56,6 @@ class QuoteDetailScreen extends StatelessWidget {
   }
 
   List<Widget> _getListViewTiles(){
-    print(_mechInfo);
-    print(_quoteInfo);
     return <Widget>[
       _createListTileWith('Business Name', _mechInfo['business_name']),
       _createListTileWith('Phone',_mechInfo['phone']),
@@ -85,19 +84,28 @@ class QuoteDetailScreen extends StatelessWidget {
       );
     }
     else{
-      return _sparePadding(8.0);
+      return _createChatBtn();
     }
   }
 
   Widget _createChatBtn(){
     return RaisedButton(
-      child: Text('Send Text'),
+      child: Text('Chat'),
       onPressed: (){_whenChatPressed();},
     );
   }
 
   void _whenChatPressed(){
-    // Fill it
+    MaterialPageRoute route = _getChatRoute();
+    Navigator.push(_context, route);
+  }
+
+  MaterialPageRoute _getChatRoute(){
+    return MaterialPageRoute(
+      builder: (BuildContext context){
+        return ChatScreen(_quoteInfo['mech_id'], _reqId, _screenType);
+      }
+    );
   }
 
   Widget _createAcceptRequestBtn(){

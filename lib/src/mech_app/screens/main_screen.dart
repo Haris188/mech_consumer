@@ -1,4 +1,5 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'add_request_form_screen.dart';
 import 'request_listing_screen.dart';
@@ -263,6 +264,7 @@ class MainScreen extends StatelessWidget {
 
   Future<void> _whenLogoutPressed() async{
     await Authenticator().logout();
+    await FirebaseAuth.instance.signOut();
     MaterialPageRoute route = _getLoginRoute();
     Navigator.push(_context, route);
   }

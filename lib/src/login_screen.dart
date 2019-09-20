@@ -98,6 +98,7 @@ class LoginScreenBody extends StatelessWidget {
     _user = await Authenticator().signInWithGoogle();
   }
 
+
   void _startMechApp(){
     if(_isLoginSuccessful()){
       MechApp(_user, _context).start();

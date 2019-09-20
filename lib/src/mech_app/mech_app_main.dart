@@ -16,7 +16,7 @@ class MechApp{
     this._context); 
 
   Future<Null> start() async{
-    _uidAvailableInDb = await _checkDbForCurrentUid();
+    _uidAvailableInDb = await checkDbForCurrentUid();
     if(_uidAvailableInDb){
       print('main');
       _navigateToScreenNamed('MainScreen');
@@ -27,7 +27,7 @@ class MechApp{
     }
   }
 
-  Future<bool> _checkDbForCurrentUid() async{
+  Future<bool> checkDbForCurrentUid() async{
     bool result;
     await Firestore.instance.collection('consumer_accounts')
       .document(_user.uid)
