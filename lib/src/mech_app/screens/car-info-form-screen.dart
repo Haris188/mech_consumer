@@ -108,7 +108,7 @@ class _CarInfoFormScreenState extends State<CarInfoFormScreen> {
     return TextFormField(
       controller: _trimController,
       decoration: InputDecoration(
-        hintText: "Sedan, Minivan, etc",
+        hintText: "SXT, SXT+, etc",
         labelText: 'Trim'
       ),
       validator: (value){return _validateNull(value);},
@@ -117,10 +117,10 @@ class _CarInfoFormScreenState extends State<CarInfoFormScreen> {
 
   Widget _createTransmissionField(BuildContext context){
     return TextFormField(
-      controller: _transmissionController,
+      controller: _driveTrainController,
       decoration: InputDecoration(
         hintText: "AWD, RWD, etc",
-        labelText: 'Transmission'
+        labelText: 'Drivetrain'
       ),
       validator: (value){return _validateNull(value);},
     );

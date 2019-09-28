@@ -18,11 +18,9 @@ class MechApp{
   Future<Null> start() async{
     _uidAvailableInDb = await checkDbForCurrentUid();
     if(_uidAvailableInDb){
-      print('main');
       _navigateToScreenNamed('MainScreen');
     }
     else{
-      print('profile');
       _navigateToScreenNamed('ProfileMakeup');
     }
   }
